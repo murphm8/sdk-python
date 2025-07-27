@@ -37,12 +37,17 @@ def remove_blank_messages_content_text(messages: Messages) -> Messages:
     replaced_blank_message_content_text = False
 
     for message in messages:
+        logger.debug(f"Checking {message} for blank content")
         # only modify assistant messages
         if "role" in message and message["role"] != "assistant":
             continue
 
         if "content" in message:
             content = message["content"]
+            # If content is empty add a blank text message to avoid errors
+            if len(content) == 0:
+                content.append({"text": "[blank text]"})
+
             has_tool_use = any("toolUse" in item for item in content)
 
             if has_tool_use:
